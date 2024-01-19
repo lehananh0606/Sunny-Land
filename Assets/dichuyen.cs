@@ -10,35 +10,59 @@ public class dichuyen : MonoBehaviour
     [SerializeField] float jumpPower = 500;
     [SerializeField] Collider2D standingCollider;
     private Rigidbody2D rb;
+    [SerializeField] int totalJumps;
+    int availableJumps;
     float HorizontalValue;
     float crouchSpeedModifier = 0.5f;
     [SerializeField] Transform groundCheckCollider;
     [SerializeField] Transform overheadCheckCollider;
-     bool isGrounded;
+    [SerializeField] bool isGrounded;
     bool facingRight = true;
     bool CrouchPressed;
     Animator animator;
-    bool jump;
+    bool coyoteJump;
+
     const float groundCheckRadius = 0.2f;
     const float overheadCheckColliderRadius = 0.2f;
-    
+    bool mutipleJumps;
 
     void Awake()
     {
+        availableJumps = totalJumps;
         rb = GetComponent<Rigidbody2D>();
        animator = GetComponent<Animator>();
     }
 
     void GroundCheck(){
+
+        bool wasGrounded = isGrounded;
         isGrounded  =false;
         
         Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheckCollider.position, groundCheckRadius, groundLayer);
-        if(colliders.Length > 0)
+        if(colliders.Length > 0){
             isGrounded = true;
+            if(!wasGrounded){
+                availableJumps=  totalJumps;
+                mutipleJumps = false;
+            }
+        }else{
+           if(wasGrounded){
+             StartCoroutine(CoyoteJumpDelay());
+           }
+        }
+            
 
             animator.SetBool("Jump", !isGrounded);
         
     }
+
+
+    IEnumerator CoyoteJumpDelay(){
+        coyoteJump = true;
+        yield return new WaitForSeconds(0.2f);
+        coyoteJump = false;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -48,12 +72,12 @@ public class dichuyen : MonoBehaviour
        if(Input.GetButtonDown("Jump")){
 
            
-            jump = true;
-             animator.SetBool("Jump", true);
+            Jump();
+            
        }
       
-       else if(Input.GetButtonUp("Jump"))
-       jump = false;
+   
+      
 
        if(Input.GetButtonDown("Crouch"))
         CrouchPressed = true;
@@ -65,29 +89,44 @@ public class dichuyen : MonoBehaviour
 
     void FixedUpdate(){
         GroundCheck();
-        Move(HorizontalValue, jump, CrouchPressed);
+        Move(HorizontalValue, CrouchPressed);
     }
 
-void Move(float dir, bool jumpFlag, bool crouchFlag){
+void Jump(){
+ if(isGrounded){
+
+        mutipleJumps = true;
+        availableJumps--;
+        rb.velocity = Vector2.up * jumpPower;
+        animator.SetBool("Jump", true);
+    }else{
+
+        if(coyoteJump){
+            mutipleJumps = true;
+            availableJumps--;
+            rb.velocity = Vector2.up * jumpPower;
+            animator.SetBool("Jump", true);
+        }
+        if(mutipleJumps && availableJumps>0){
+             availableJumps--;
+            rb.velocity = Vector2.up * jumpPower;
+            animator.SetBool("Jump", true);
+        }
+    }
+ 
+}
+
+void Move(float dir, bool crouchFlag){
     if(!crouchFlag){
         if(Physics2D.OverlapCircle(overheadCheckCollider.position, overheadCheckColliderRadius, groundLayer)){
             crouchFlag = true;
         }
-    }
-
-
-    if(isGrounded){
-        
         standingCollider.enabled = !crouchFlag;
-
-        if(jumpFlag)
-        { 
-           // isGrounded = false ;
-            jumpFlag = false;
-
-        rb.AddForce(new Vector2(0f, jumpPower));
     }
-    }
+
+
+   
+    
 
     float xVal = dir * speed * 100 * Time.deltaTime;
     Vector2 targetVelocity = new Vector2(xVal, rb.velocity.y);
@@ -113,6 +152,15 @@ void Move(float dir, bool jumpFlag, bool crouchFlag){
     
 
 }
+
+    private void OnDrawGizmos(){
+
+    }
+
+    private void OnDrawGizmosSelected(){
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(groundCheckCollider.position, groundCheckRadius);
+    }
 
    
 }
