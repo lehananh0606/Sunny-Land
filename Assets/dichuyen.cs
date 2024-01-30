@@ -67,6 +67,10 @@ public class dichuyen : MonoBehaviour
     void Update()
     {
         
+        if(CanMove()==false)
+            return;
+        
+
         HorizontalValue = Input.GetAxisRaw("Horizontal");
        
        if(Input.GetButtonDown("Jump")){
@@ -91,6 +95,13 @@ public class dichuyen : MonoBehaviour
         GroundCheck();
         Move(HorizontalValue, CrouchPressed);
     }
+
+bool CanMove(){
+    bool can = true;
+    if(FindObjectOfType<InteractionSystem>().isExamining)
+    can = false;
+    return can;
+}
 
 void Jump(){
  if(isGrounded){

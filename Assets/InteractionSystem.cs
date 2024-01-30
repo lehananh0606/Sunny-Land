@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InteractionSystem : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public LayerMask detectionLayer;
 public GameObject detectedObject;
 public List<GameObject> pickedItem = new List<GameObject>();
 
+ public GameObject examineWindow;
+public Image examineImage;
+public Text examineText;
+public bool isExamining;
     void Update()
     {
         if(DetectObject()){
@@ -44,5 +49,22 @@ public List<GameObject> pickedItem = new List<GameObject>();
         pickedItem.Add(item);
 
     }
+
+    public void ExamineItem(Item item){
+        if(isExamining)
+        {
+            examineWindow.SetActive(true);
+            isExamining = false;
+        }else
+        {
+        examineImage.sprite = item.GetComponent<SpriteRenderer>().sprite;
+        examineText.text = item.descriptionText;
+        examineWindow.SetActive(true);
+        isExamining = true;
+        }
+        
+    }
+
+   
     
 }

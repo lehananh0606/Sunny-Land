@@ -4,7 +4,9 @@ using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 [RequireComponent(typeof(BoxCollider2D))]
+
 
 public class Item : MonoBehaviour
 {
@@ -20,6 +22,10 @@ public class Item : MonoBehaviour
 
     //Customer Event
     public UnityEvent customEvent;
+   
+    public string descriptionText;
+    
+
 
 
     private void Reset(){
@@ -36,6 +42,8 @@ public class Item : MonoBehaviour
                 gameObject.SetActive(false);
                 break;
             case InteracsionType.Examine:
+                FindObjectOfType<InteractionSystem>().ExamineItem(this);
+
                 break;
             default:
             break;
