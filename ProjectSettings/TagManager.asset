@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Trap
+  - Cherry
+  - Vanish
   layers:
   - Default
   - TransparentFX
@@ -43,6 +46,9 @@ TagManager:
     locked: 0
   - name: background
     uniqueID: 321273041
+    locked: 0
+  - name: trap
+    uniqueID: 1558373709
     locked: 0
   - name: dat
     uniqueID: 2878991647
